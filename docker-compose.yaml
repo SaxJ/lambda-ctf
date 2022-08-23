@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+    db:
+      image: postgres
+      ports:
+        - 5432:5432
+      environment:
+        - POSTGRES_USER=ctf
+        - POSTGRES_PASSWORD=ctf
+        - POSTGRES_DB=ctf
+      networks:
+        - db
+
+    adminer:
+      image: adminer
+      restart: always
+      ports:
+        - 8080:8080
+      networks:
+        - db
+
+networks:
+    db:
+        driver: bridge

@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+    db:
+      image: postgres
+      ports:
+        - 6432:5432
+      environment:
+        - POSTGRES_USER=okr
+        - POSTGRES_PASSWORD=okr
+        - POSTGRES_DB=okr
+      networks:
+        - db
+
+    adminer:
+      image: adminer
+      restart: always
+      ports:
+        - 8080:8080
+      networks:
+        - db
+
+networks:
+    db:
+        driver: bridge
