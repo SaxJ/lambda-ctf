@@ -1,0 +1,14 @@
+<h1>
+    #{challengeName challenge}
+<h2>Information
+<p>
+    #{challengeInformation challenge}
+
+<h3>Submit Flag
+<form method=post action=@{ChallengeR cid} enctype=#{encType}>
+    ^{flagWidget}
+    <button type=submit>
+        Submit
+
+$maybe alert <- msg
+    <p>#{alert}

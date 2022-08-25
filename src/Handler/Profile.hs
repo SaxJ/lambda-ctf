@@ -11,24 +11,34 @@ import Import
 
 getProfileR :: Handler Html
 getProfileR = do
-  (_, user) <- requireAuthPair
+  (uid, user) <- requireAuthPair
+  comps <- runDB $ selectList ([] :: [Filter Competition]) []
+
+  subs <- runDB $ selectList ([SubmissionUserId ==. uid] :: [Filter Submission]) []
+  chals' <- mapM getSubChallenge subs
+  let chals = concat chals'
+
   (compWidget, compEncType) <- generateFormPost competitionCreationForm
-  profileLayout user compWidget compEncType Nothing
+  defaultLayout $ do
+    setTitle . toHtml $ userIdent user <> "'s User page"
+    $(widgetFile "profile")
+  where
+    getSubChallenge s = do
+      runDB $ selectList ([ChallengeId ==. submissionChallengeId (entityVal s)] :: [Filter Challenge]) []
 
 postProfileR :: Handler Html
 postProfileR = do
   (_, user) <- requireAuthPair
-  ((result, formWidget), formEncType) <- runFormPost competitionCreationForm
-  created <- case result of
-    FormSuccess c -> do
-      entity <- runDB $ insertEntity $ Competition (name c) (unTextarea $ description c) Nothing Nothing
-      return $ Just entity
-    _ -> return Nothing
-  profileLayout user formWidget formEncType created
-
-profileLayout user compWidget compEncType mCreated = defaultLayout $ do
-  setTitle . toHtml $ userIdent user <> "'s User page"
-  $(widgetFile "profile")
+  ((result, _), _) <- runFormPost competitionCreationForm
+  _ <- if userAdmin user then createAction result else return Nothing
+  redirect ProfileR
+  where
+    createAction r =
+      case r of
+        FormSuccess c -> do
+          entity <- runDB $ insertEntity $ Competition (name c) (unTextarea $ description c) Nothing Nothing
+          return $ Just entity
+        _ -> return Nothing
 
 data CompetitionForm = CompetitionForm
   { name :: Text,

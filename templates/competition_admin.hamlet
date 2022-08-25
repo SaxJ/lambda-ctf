@@ -1,0 +1,22 @@
+<h1>
+    #{competitionName comp}
+<h2>
+    #{competitionDescription comp}
+
+<table>
+    <tr>
+        <th>Challenge
+        <th>Score
+    $forall challenge <- challenges
+        <tr>
+            <td>
+                <a href=@{ChallengeR $ entityKey challenge}>
+                    #{challengeName $ entityVal challenge}
+            <td>
+                #{challengeScore $ entityVal challenge}
+<hr>
+<h3>New Challenge
+<form method=post action=@{CompetitionAdminR cid} enctype=#{encType}>
+    ^{widget}
+    <button type="submit">
+        Done

@@ -2,12 +2,26 @@
     $if userAdmin user
         <h1>
             Hello admin
-        $maybe _ <- mCreated
-            <h3>Created competition
+        <table>
+            $forall comp <- comps
+                <tr>
+                    <td>#{competitionName $ entityVal comp}
+                    <td>#{show $ competitionStarted $ entityVal comp}
+                    <td>#{show $ competitionEnded $ entityVal comp}
         <form method=post action=@{ProfileR} enctype=#{compEncType}>
             ^{compWidget}
             <button type="submit">
                 Done
-    $else
-        <h1>
-            Hello peasant
+
+    <h1>
+        Successful Submissions
+    <table>
+        <tr>
+            <th>Challenge
+            <th>Score
+        $forall chal <- chals
+            <tr>
+                <td>
+                    <a href=@{ChallengeR $ entityKey chal}>
+                        #{challengeName $ entityVal chal}
+                <td>#{challengeScore $ entityVal chal}

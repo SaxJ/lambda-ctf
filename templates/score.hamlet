@@ -1,0 +1,9 @@
+<h1>Scores
+<table>
+    <tr>
+        <th>User
+        <th>Score
+    $forall (user, score) <- userScores
+        <tr>
+            <td>#{userIdent $ entityVal user}
+            <td>#{score}
