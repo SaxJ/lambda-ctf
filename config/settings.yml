@@ -41,7 +41,7 @@ database:
   poolsize: "_env:YESOD_PGPOOLSIZE:10"
 
 copyright: Saxon Jensen (2022)
-slackid: "_env:SLACK_ID:foo"
-slacksecret: "_env:SLACK_SECRET:bar"
+googleid: "_env:GOOGLE_ID:foo"
+googlesecret: "_env:GOOGLE_SECRET:bar"
 
 #analytics: UA-YOURCODE

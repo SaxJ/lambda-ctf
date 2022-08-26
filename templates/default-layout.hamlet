@@ -2,6 +2,12 @@
     $forall MenuItem label route _ <- navItems
         <span>
             <a href="@{route}">#{label}
+    $maybe (_, user) <- muser
+        <span .loggedin>
+            Logged in as #{userName user} (<a href=@{AuthR LogoutR}>Logout</a>)
+    $nothing
+        <span .loggedin>
+            <a href=@{AuthR LoginR}>Login
 <hr>
 
 <!-- Page Contents -->

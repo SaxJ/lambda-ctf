@@ -5,5 +5,5 @@
         <th>Score
     $forall (user, score) <- userScores
         <tr>
-            <td>#{userIdent $ entityVal user}
+            <td>#{userName $ entityVal user}
             <td>#{score}

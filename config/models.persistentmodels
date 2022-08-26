@@ -2,16 +2,13 @@
 -- Syntax for this file here: https://github.com/yesodweb/persistent/blob/master/docs/Persistent-entity-syntax.md
 
 User
-    ident Text
-    password Text Maybe
-    admin Bool default=false
-    UniqueUser ident
-    deriving Typeable
-Email
+    name Text
     email Text
-    userId UserId Maybe
-    verkey Text Maybe
-    UniqueEmail email
+    plugin Text
+    ident Text
+    admin Bool default=false
+    UniqueUser plugin ident
+    deriving Typeable
 Comment json -- Adding "json" causes ToJSON and FromJSON instances to be derived.
     message Text
     userId UserId Maybe

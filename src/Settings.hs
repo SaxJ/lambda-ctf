@@ -62,8 +62,8 @@ data AppSettings = AppSettings
 
     , appAuthDummyLogin         :: Bool
     -- ^ Indicate if auth dummy login should be enabled.
-    , appSlackClientId :: Text
-    , appSlackClientSecret :: Text
+    , appGoogleClientId :: Text
+    , appGoogleClientSecret :: Text
     }
 
 instance FromJSON AppSettings where
@@ -90,8 +90,8 @@ instance FromJSON AppSettings where
         appSkipCombining          <- o .:? "skip-combining"   .!= dev
 
         appCopyright              <- o .:  "copyright"
-        appSlackClientId              <- o .:  "slackid"
-        appSlackClientSecret              <- o .:  "slacksecret"
+        appGoogleClientId              <- o .:  "googleid"
+        appGoogleClientSecret              <- o .:  "googlesecret"
         appAnalytics              <- o .:? "analytics"
 
         appAuthDummyLogin         <- o .:? "auth-dummy-login"      .!= dev

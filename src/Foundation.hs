@@ -3,6 +3,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE ViewPatterns #-}
@@ -13,12 +14,15 @@ module Foundation where
 import Control.Monad.Logger (LogSource)
 -- Used only when in "auth-dummy-login" setting is enabled.
 
+import Data.Aeson
+import Data.ByteString.Lazy.Internal (packChars)
 import qualified Data.CaseInsensitive as CI
 import qualified Data.Text.Encoding as TE
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Import.NoFoundation
 import Text.Hamlet (hamletFile)
 import Text.Jasmine (minifym)
+import Yesod.Auth.OAuth2.Google (oauth2Google)
 import Yesod.Auth.OAuth2.Slack
 import Yesod.Core.Types (Logger)
 import qualified Yesod.Core.Unsafe as Unsafe
@@ -124,18 +128,6 @@ instance Yesod App where
               MenuItem
                 { menuItemLabel = "Profile",
                   menuItemRoute = ProfileR,
-                  menuItemAccessCallback = isJust muser
-                },
-            NavbarRight $
-              MenuItem
-                { menuItemLabel = "Login",
-                  menuItemRoute = AuthR LoginR,
-                  menuItemAccessCallback = isNothing muser
-                },
-            NavbarRight $
-              MenuItem
-                { menuItemLabel = "Logout",
-                  menuItemRoute = AuthR LogoutR,
                   menuItemAccessCallback = isJust muser
                 },
             NavbarRight $
@@ -266,15 +258,13 @@ instance YesodAuth App where
   redirectToReferer :: App -> Bool
   redirectToReferer _ = True
 
-  maybeAuthId = return Nothing
-
   authenticate ::
     (MonadHandler m, HandlerSite m ~ App) =>
     Creds App ->
     m (AuthenticationResult App)
-  authenticate creds = liftHandler $
+  authenticate creds = liftHandler $ do
     runDB $ do
-      x <- getBy $ UniqueUser $ credsIdent creds
+      x <- getBy $ UniqueUser (credsPlugin creds) (credsIdent creds)
       case x of
         Just (Entity uid _) -> return $ Authenticated uid
         Nothing ->
@@ -282,13 +272,15 @@ instance YesodAuth App where
             <$> insert
               User
                 { userIdent = credsIdent creds,
-                  userPassword = Nothing,
-                  userAdmin = False
+                  userAdmin = False,
+                  userEmail = fromMaybe "" $ extrasToEmail $ credsExtra creds,
+                  userPlugin = credsPlugin creds,
+                  userName = takeWhile (/= '@') $ fromMaybe "" $ extrasToEmail $ credsExtra creds
                 }
 
   -- You can add other plugins like Google Email, email or OAuth here
   authPlugins :: App -> [AuthPlugin App]
-  authPlugins app = [oauth2Slack (appSlackClientId $ appSettings app) (appSlackClientSecret $ appSettings app)]
+  authPlugins app = [oauth2Google (appGoogleClientId $ appSettings app) (appGoogleClientSecret $ appSettings app)]
 
 -- | Access function to determine if a user is logged in.
 isAuthenticated :: Handler AuthResult
@@ -304,6 +296,27 @@ isAdmin = do
   return $ case mu of
     Nothing -> Unauthorized "You must be admin"
     Just u -> if userAdmin $ entityVal u then Authorized else Unauthorized "You must be admin"
+
+extrasToEmail :: [(Text, Text)] -> Maybe Text
+extrasToEmail extras =
+  let jsonText = fromMaybe "" (lookup "userResponse" extras) :: Text
+      mResp = decode (packChars $ unpack jsonText) :: Maybe Object
+   in case mResp of
+        Nothing -> Nothing
+        Just o ->
+          let me = lookup "email" o
+           in case me of
+                Just (String s) -> Just s
+                _ -> Nothing
+
+upsertUser :: User -> DB UserId
+upsertUser user =
+  entityKey
+    <$> upsert
+      user
+      [ UserName =. userName user,
+        UserEmail =. userEmail user
+      ]
 
 instance YesodAuthPersist App
 
