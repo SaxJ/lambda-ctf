@@ -20,7 +20,9 @@ import Import.NoFoundation
 import Text.Hamlet (hamletFile)
 import Text.Jasmine (minifym)
 import Yesod.Auth.Dummy
-import Yesod.Auth.OAuth2.Slack (oauth2Slack)
+import Yesod.Auth.Email (authEmail)
+import Yesod.Auth.OAuth2 (getUserResponseJSON)
+import Yesod.Auth.OAuth2.Slack
 import Yesod.Auth.OpenId (IdentifierType (Claimed), authOpenId)
 import Yesod.Core.Types (Logger)
 import qualified Yesod.Core.Unsafe as Unsafe
@@ -268,6 +270,8 @@ instance YesodAuth App where
   redirectToReferer :: App -> Bool
   redirectToReferer _ = True
 
+  maybeAuthId = return Nothing
+
   authenticate ::
     (MonadHandler m, HandlerSite m ~ App) =>
     Creds App ->
@@ -288,10 +292,7 @@ instance YesodAuth App where
 
   -- You can add other plugins like Google Email, email or OAuth here
   authPlugins :: App -> [AuthPlugin App]
-  authPlugins app = [authOpenId Claimed [], oauth2Slack (appSlackClientId $ appSettings app) (appSlackClientSecret $ appSettings app)] ++ extraAuthPlugins
-    where
-      -- Enable authDummy login if enabled.
-      extraAuthPlugins = [authDummy | appAuthDummyLogin $ appSettings app]
+  authPlugins app = [oauth2Slack (appSlackClientId $ appSettings app) (appSlackClientSecret $ appSettings app)]
 
 -- | Access function to determine if a user is logged in.
 isAuthenticated :: Handler AuthResult
