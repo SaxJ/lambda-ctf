@@ -19,11 +19,7 @@ import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Import.NoFoundation
 import Text.Hamlet (hamletFile)
 import Text.Jasmine (minifym)
-import Yesod.Auth.Dummy
-import Yesod.Auth.Email (authEmail)
-import Yesod.Auth.OAuth2 (getUserResponseJSON)
 import Yesod.Auth.OAuth2.Slack
-import Yesod.Auth.OpenId (IdentifierType (Claimed), authOpenId)
 import Yesod.Core.Types (Logger)
 import qualified Yesod.Core.Unsafe as Unsafe
 import Yesod.Default.Util (addStaticContentExternal)
