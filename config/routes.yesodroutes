@@ -11,6 +11,8 @@
 
 /competition/#CompetitionId CompetitionR GET
 /competition/#CompetitionId/admin CompetitionAdminR GET POST
+/competition/#CompetitionId/start CompetitionStartR POST
+/competition/#CompetitionId/end CompetitionEndR POST
 
 /challenge/#ChallengeId ChallengeR GET POST
 

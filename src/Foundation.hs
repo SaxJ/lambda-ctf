@@ -22,6 +22,7 @@ import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Import.NoFoundation
 import Text.Hamlet (hamletFile)
 import Text.Jasmine (minifym)
+import Yesod.Auth.Dummy (authDummy)
 import Yesod.Auth.OAuth2.Google (oauth2Google)
 import Yesod.Auth.OAuth2.Slack
 import Yesod.Core.Types (Logger)
@@ -177,6 +178,8 @@ instance Yesod App where
   isAuthorized (ChallengeR _) _ = isAuthenticated
   isAuthorized (CompetitionAdminR _) _ = isAdmin
   isAuthorized ScoreR _ = isAuthenticated
+  isAuthorized (CompetitionStartR _) _ = isAdmin
+  isAuthorized (CompetitionEndR _) _ = isAdmin
 
   -- This function creates static content files in the static folder
   -- and names them based on a hash of their content. This allows
@@ -280,7 +283,7 @@ instance YesodAuth App where
 
   -- You can add other plugins like Google Email, email or OAuth here
   authPlugins :: App -> [AuthPlugin App]
-  authPlugins app = [oauth2Google (appGoogleClientId $ appSettings app) (appGoogleClientSecret $ appSettings app)]
+  authPlugins app = [oauth2Google (appGoogleClientId $ appSettings app) (appGoogleClientSecret $ appSettings app), authDummy]
 
 -- | Access function to determine if a user is logged in.
 isAuthenticated :: Handler AuthResult
