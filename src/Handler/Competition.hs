@@ -40,7 +40,7 @@ postCompetitionAdminR cid = do
     createAction r =
       case r of
         FormSuccess c -> do
-          entity <- runDB $ insertEntity $ Challenge (challengeFormName c) (unMarkdown $ challengeFormInformation c) cid 1 (challengeFormFlags c)
+          entity <- runDB $ insertEntity $ Challenge (challengeFormName c) (unMarkdown $ challengeFormInformation c) cid 1
           return $ Just entity
         _ -> return Nothing
 
@@ -61,8 +61,7 @@ competitionChallenges cid = [ChallengeComptitionId ==. cid]
 
 data ChallengeForm = ChallengeForm
   { challengeFormName :: Text,
-    challengeFormInformation :: Markdown,
-    challengeFormFlags :: Text
+    challengeFormInformation :: Markdown
   }
 
 challengeCreationForm :: Form ChallengeForm
@@ -71,4 +70,3 @@ challengeCreationForm =
     ChallengeForm
       <$> areq textField "Name" Nothing
       <*> areq markdownField "Description" Nothing
-      <*> areq textField "Flags (Pipe Separated)" Nothing

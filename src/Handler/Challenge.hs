@@ -36,26 +36,22 @@ getChallengeR cid = do
 postChallengeR :: ChallengeId -> Handler Html
 postChallengeR cid = do
   (uid, _) <- requireAuthPair
-  mChallenge <- runDB $ get cid
-  ((result, _), _) <- runFormPost flagSubmissionForm
+  challenge <- runDB $ get404 cid
+  flags <- runDB $ selectList [FlagChallengeId ==. cid] []
+  ((submission, _), _) <- runFormPost flagSubmissionForm
   (flagWidget, encType) <- generateFormPost flagSubmissionForm
 
-  let goodSubmission = checkResult result mChallenge
+  let goodSubmission = checkResult submission flags
   let msg = if goodSubmission then Just "Correct" :: Maybe String else Just "Incorrect"
   Control.Monad.when goodSubmission $ do
     _ <- runDB $ insert $ Submission uid cid
     return ()
 
-  case mChallenge of
-    Just challenge ->
-      defaultLayout
-        $(widgetFile "challenge")
-    Nothing -> notFound
+  defaultLayout
+    $(widgetFile "challenge")
   where
-    checkResult r mc = case r of
-      FormSuccess f -> case mc of
-        Just c -> formFlag f `isInfixOf` challengeFlags c
-        _ -> False
+    checkResult r fs = case r of
+      FormSuccess f -> formFlag f `elem` map (flagValue . entityVal) fs
       _ -> False
 
 data FlagSubmissionForm = FlagSubmissionForm
@@ -67,3 +63,4 @@ flagSubmissionForm =
   renderDivs $
     FlagSubmissionForm
       <$> areq textField "Flag" Nothing
+

@@ -24,7 +24,9 @@ Challenge
     information Text
     comptitionId CompetitionId
     score Int
-    flags Text
+Flag
+    challengeId ChallengeId
+    value Text
 Submission
     userId UserId
     challengeId ChallengeId
