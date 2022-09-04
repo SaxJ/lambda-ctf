@@ -2,7 +2,7 @@
     #{challengeName challenge}
 <h2>Information
 <p>
-    #{challengeInformation challenge}
+    ^{renderedChallengeInformation $ Just challenge}
 
 <h3>Submit Flag
 <form method=post action=@{ChallengeR cid} enctype=#{encType}>

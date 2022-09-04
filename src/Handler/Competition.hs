@@ -8,6 +8,7 @@
 module Handler.Competition where
 
 import Import
+import Yesod.Markdown (markdownField, Markdown (..))
 
 getCompetitionR :: CompetitionId -> Handler Html
 getCompetitionR cid = do
@@ -39,7 +40,7 @@ postCompetitionAdminR cid = do
     createAction r =
       case r of
         FormSuccess c -> do
-          entity <- runDB $ insertEntity $ Challenge (challengeFormName c) (unTextarea $ challengeFormInformation c) cid 1 (challengeFormFlags c)
+          entity <- runDB $ insertEntity $ Challenge (challengeFormName c) (unMarkdown $ challengeFormInformation c) cid 1 (challengeFormFlags c)
           return $ Just entity
         _ -> return Nothing
 
@@ -60,7 +61,7 @@ competitionChallenges cid = [ChallengeComptitionId ==. cid]
 
 data ChallengeForm = ChallengeForm
   { challengeFormName :: Text,
-    challengeFormInformation :: Textarea,
+    challengeFormInformation :: Markdown,
     challengeFormFlags :: Text
   }
 
@@ -69,5 +70,5 @@ challengeCreationForm =
   renderDivs $
     ChallengeForm
       <$> areq textField "Name" Nothing
-      <*> areq textareaField "Description" Nothing
+      <*> areq markdownField "Description" Nothing
       <*> areq textField "Flags (Pipe Separated)" Nothing

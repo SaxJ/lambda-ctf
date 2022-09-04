@@ -11,7 +11,16 @@
 module Handler.Challenge where
 
 import qualified Control.Monad
+import Yesod.Markdown
 import Import
+import Data.Either (fromRight)
+
+renderedChallengeInformation :: Maybe Challenge -> Html
+renderedChallengeInformation mc = info
+  where
+      info = case mc of
+        Just challenge -> fromRight "" $ markdownToHtml $ Markdown $ challengeInformation challenge
+        _ -> ""
 
 getChallengeR :: ChallengeId -> Handler Html
 getChallengeR cid = do
