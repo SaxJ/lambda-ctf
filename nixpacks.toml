@@ -1,0 +1,9 @@
+[phases.setup]
+cmd = 'stack setup'
+
+[phases.build]
+aptPkgs = ['libpq-dev']
+cmd = 'stack install'
+
+[start]
+cmd = 'stack run'
