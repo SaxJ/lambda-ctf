@@ -7,7 +7,6 @@ dependencies:
 - yesod 
 - yesod-core 
 - yesod-auth 
-- yesod-static 
 - yesod-form 
 - yesod-markdown
 - classy-prelude 
