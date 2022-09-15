@@ -19,8 +19,7 @@ dependencies:
 - persistent-template 
 - template-haskell
 - shakespeare 
-- hjsmin 
-- monad-control 
+- monad-control
 - wai-extra 
 - yaml 
 - http-client-tls 
