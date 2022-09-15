@@ -36,7 +36,6 @@ packages:
 #
 extra-deps:
   - classy-prelude-yesod-1.5.0 
-  - language-javascript-0.6.0.14
 
 # Override default flag values for local packages and extra-deps
 # flags: {}
