@@ -21,7 +21,6 @@ import qualified Data.Text.Encoding as TE
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Import.NoFoundation
 import Text.Hamlet (hamletFile)
-import Text.Jasmine (minifym)
 import Yesod.Auth.Dummy (authDummy)
 import Yesod.Auth.OAuth2.Google (oauth2Google)
 import Yesod.Auth.OAuth2.Slack
@@ -180,33 +179,6 @@ instance Yesod App where
   isAuthorized ScoreR _ = isAuthenticated
   isAuthorized (CompetitionStartR _) _ = isAdmin
   isAuthorized (CompetitionEndR _) _ = isAdmin
-
-  -- This function creates static content files in the static folder
-  -- and names them based on a hash of their content. This allows
-  -- expiration dates to be set far in the future without worry of
-  -- users receiving stale content.
-  addStaticContent ::
-    -- | The file extension
-    Text ->
-    -- | The MIME content type
-    Text ->
-    -- | The contents of the file
-    LByteString ->
-    Handler (Maybe (Either Text (Route App, [(Text, Text)])))
-  addStaticContent ext mime content = do
-    master <- getYesod
-    let staticDir = appStaticDir $ appSettings master
-    addStaticContentExternal
-      minifym
-      genFileName
-      staticDir
-      (StaticR . flip StaticRoute [])
-      ext
-      mime
-      content
-    where
-      -- Generate a unique filename based on the content itself
-      genFileName lbs = "autogen-" ++ base64md5 lbs
 
   -- What messages should be logged. The following includes all messages when
   -- in development, and warnings and errors in production.
