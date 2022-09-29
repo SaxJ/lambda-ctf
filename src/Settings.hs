@@ -64,6 +64,7 @@ data AppSettings = AppSettings
     -- ^ Indicate if auth dummy login should be enabled.
     , appGoogleClientId :: Text
     , appGoogleClientSecret :: Text
+    , appSlackWebhook :: String
     }
 
 instance FromJSON AppSettings where

@@ -7,6 +7,7 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
 {-# HLINT ignore "Use newtype instead of data" #-}
+{-# LANGUAGE DeriveGeneric #-}
 
 module Handler.Challenge where
 
@@ -14,6 +15,9 @@ import qualified Control.Monad
 import Yesod.Markdown
 import Import
 import Data.Either (fromRight)
+import Network.HTTP.Simple (setRequestBodyJSON, httpNoBody)
+import Data.Aeson (defaultOptions)
+import Data.Aeson.Types (genericToEncoding)
 
 renderedChallengeInformation :: Maybe Challenge -> Html
 renderedChallengeInformation mc = info
@@ -35,7 +39,8 @@ getChallengeR cid = do
 
 postChallengeR :: ChallengeId -> Handler Html
 postChallengeR cid = do
-  (uid, _) <- requireAuthPair
+  app <- getYesod
+  (uid, user) <- requireAuthPair
   challenge <- runDB $ get404 cid
   flags <- runDB $ selectList [FlagChallengeId ==. cid] []
   ((submission, _), _) <- runFormPost flagSubmissionForm
@@ -44,6 +49,7 @@ postChallengeR cid = do
   let goodSubmission = checkResult submission flags
   let msg = if goodSubmission then Just "Correct" :: Maybe String else Just "Incorrect"
   Control.Monad.when goodSubmission $ do
+    _ <- makeSlackRequest app (challengeName challenge) (userIdent user)
     _ <- runDB $ insert $ Submission uid cid
     return ()
 
@@ -53,6 +59,23 @@ postChallengeR cid = do
     checkResult r fs = case r of
       FormSuccess f -> formFlag f `elem` map (flagValue . entityVal) fs
       _ -> False
+
+makeSlackRequest :: MonadIO m => App -> Text -> Text -> m (Response ())
+makeSlackRequest app c u = do
+  Network.HTTP.Simple.httpNoBody postReq
+  where
+    initReq = parseRequest_ (appSlackWebhook $ appSettings app)
+    body = SlackBody u c
+    jsonReq = setRequestBodyJSON body initReq
+    postReq = jsonReq {method = "POST"}
+
+data SlackBody = SlackBody
+  { user :: Text
+  , challenge :: Text
+  } deriving (Generic, Show)
+instance ToJSON SlackBody where
+  toEncoding = genericToEncoding defaultOptions
+instance FromJSON SlackBody
 
 data FlagSubmissionForm = FlagSubmissionForm
   { formFlag :: Text
