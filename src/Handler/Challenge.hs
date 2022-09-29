@@ -65,7 +65,7 @@ makeSlackRequest app c u = do
   $(logError) (appSlackWebhook $ appSettings app)
   Network.HTTP.Simple.httpNoBody postReq
   where
-    initReq = parseRequest_ (unpack $ appSlackWebhook $ appSettings app)
+    initReq = parseRequest_ ("https://" ++ unpack (appSlackWebhook $ appSettings app))
     body = SlackBody u c
     jsonReq = setRequestBodyJSON body initReq
     postReq = jsonReq {method = "POST"}
