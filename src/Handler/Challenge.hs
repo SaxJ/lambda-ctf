@@ -16,7 +16,7 @@ import qualified Control.Monad
 import Yesod.Markdown
 import Import
 import Data.Either (fromRight)
-import Network.HTTP.Simple (setRequestBodyJSON, httpNoBody, setRequestMethod)
+import Network.HTTP.Simple (setRequestBodyJSON, httpNoBody, setRequestMethod, setRequestPort)
 import Data.Aeson (defaultOptions)
 import Data.Aeson.Types (genericToEncoding)
 import System.Environment (getEnv)
@@ -66,7 +66,7 @@ makeSlackRequest :: (MonadIO m, MonadLogger m) => App -> Text -> Text -> m (Resp
 makeSlackRequest app c u = do
   hook <- liftIO $ getEnv "SLACK_WEBHOOK"
   let body = SlackBody u c
-  let req = setRequestMethod "POST" $ setRequestBodyJSON body $ parseRequest_ hook
+  let req = setRequestMethod "POST" $ setRequestPort 443 $ setRequestBodyJSON body $ parseRequest_ hook
   Network.HTTP.Simple.httpNoBody req
 
 data SlackBody = SlackBody
