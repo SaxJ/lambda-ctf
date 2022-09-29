@@ -8,6 +8,7 @@
 
 {-# HLINT ignore "Use newtype instead of data" #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# OPTIONS_GHC -Wno-unused-matches #-}
 
 module Handler.Challenge where
 
@@ -15,9 +16,10 @@ import qualified Control.Monad
 import Yesod.Markdown
 import Import
 import Data.Either (fromRight)
-import Network.HTTP.Simple (setRequestBodyJSON, httpNoBody)
+import Network.HTTP.Simple (setRequestBodyJSON, httpNoBody, setRequestMethod)
 import Data.Aeson (defaultOptions)
 import Data.Aeson.Types (genericToEncoding)
+import System.Environment (getEnv)
 
 renderedChallengeInformation :: Maybe Challenge -> Html
 renderedChallengeInformation mc = info
@@ -62,12 +64,10 @@ postChallengeR cid = do
 
 makeSlackRequest :: (MonadIO m, MonadLogger m) => App -> Text -> Text -> m (Response ())
 makeSlackRequest app c u = do
-  Network.HTTP.Simple.httpNoBody postReq
-  where
-    initReq = parseRequest_ ("https://" ++ unpack (appSlackWebhook $ appSettings app))
-    body = SlackBody u c
-    jsonReq = setRequestBodyJSON body initReq
-    postReq = jsonReq {method = "POST"}
+  hook <- liftIO $ getEnv "SLACK_WEBHOOK"
+  let body = SlackBody u c
+  let req = setRequestMethod "POST" $ setRequestBodyJSON body $ parseRequest_ hook
+  Network.HTTP.Simple.httpNoBody req
 
 data SlackBody = SlackBody
   { user :: Text
