@@ -10,6 +10,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# OPTIONS_GHC -Wno-unused-matches #-}
 {-# LANGUAGE StrictData #-}
+{-# LANGUAGE GADTs #-}
 
 module Handler.Challenge where
 
@@ -71,10 +72,9 @@ makeSlackRequest app c u = do
   let req = HTTP.setRequestBodyJSON body $ initReq {method = "POST"}
   HTTP.httpNoBody req
 
-data SlackBody = SlackBody
-  { user :: Text
-  , challenge :: Text
-  } deriving (Generic, Show)
+data SlackBody where
+  SlackBody :: {user :: Text, challenge :: Text} -> SlackBody
+  deriving (Generic, Show)
 instance ToJSON SlackBody where
   toEncoding = genericToEncoding defaultOptions
 instance FromJSON SlackBody
