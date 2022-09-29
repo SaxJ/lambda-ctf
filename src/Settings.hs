@@ -95,7 +95,7 @@ instance FromJSON AppSettings where
         appGoogleClientId         <- o .:  "googleid"
         appGoogleClientSecret     <- o .:  "googlesecret"
         appSlackWebhook           <- o .:  "slackwebhook"
-        appAllowedDomain          <- o .:  "allowedDomain"
+        appAllowedDomain          <- o .:  "alloweddomain"
         appAnalytics              <- o .:? "analytics"
 
         appAuthDummyLogin         <- o .:? "auth-dummy-login"      .!= dev

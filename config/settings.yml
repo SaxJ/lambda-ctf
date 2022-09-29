@@ -43,7 +43,7 @@ database:
 copyright: Saxon Jensen (2022)
 googleid: "_env:GOOGLE_ID:foo"
 googlesecret: "_env:GOOGLE_SECRET:bar"
-slackwebhook: "_env:SLACK_WEBHOOK:localtest.me"
-allowedDomain: "_env:ALLOWED_DOMAIN:gmail.com"
+slackwebhook: "_env:SLACK_WEBHOOK:https://localtest.me"
+alloweddomain: "_env:ALLOWED_DOMAIN:gmail.com"
 
 #analytics: UA-YOURCODE

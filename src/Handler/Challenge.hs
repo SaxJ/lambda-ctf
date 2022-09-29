@@ -62,7 +62,6 @@ postChallengeR cid = do
 
 makeSlackRequest :: (MonadIO m, MonadLogger m) => App -> Text -> Text -> m (Response ())
 makeSlackRequest app c u = do
-  $(logError) (appSlackWebhook $ appSettings app)
   Network.HTTP.Simple.httpNoBody postReq
   where
     initReq = parseRequest_ ("https://" ++ unpack (appSlackWebhook $ appSettings app))
