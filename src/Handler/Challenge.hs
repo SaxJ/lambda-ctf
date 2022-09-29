@@ -23,8 +23,8 @@ renderedChallengeInformation :: Maybe Challenge -> Html
 renderedChallengeInformation mc = info
   where
       info = case mc of
-        Just challenge -> fromRight "" $ markdownToHtml $ Markdown $ challengeInformation challenge
-        _ -> ""
+        Just c -> fromRight "" $ markdownToHtml $ Markdown $ challengeInformation c
+        Nothing -> ""
 
 getChallengeR :: ChallengeId -> Handler Html
 getChallengeR cid = do
