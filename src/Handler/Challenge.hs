@@ -60,8 +60,9 @@ postChallengeR cid = do
       FormSuccess f -> formFlag f `elem` map (flagValue . entityVal) fs
       _ -> False
 
-makeSlackRequest :: MonadIO m => App -> Text -> Text -> m (Response ())
+makeSlackRequest :: (MonadIO m, MonadLogger m) => App -> Text -> Text -> m (Response ())
 makeSlackRequest app c u = do
+  $(logError) (appSlackWebhook $ appSettings app)
   Network.HTTP.Simple.httpNoBody postReq
   where
     initReq = parseRequest_ (unpack $ appSlackWebhook $ appSettings app)
