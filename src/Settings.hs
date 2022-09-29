@@ -94,7 +94,7 @@ instance FromJSON AppSettings where
         appCopyright              <- o .:  "copyright"
         appGoogleClientId              <- o .:  "googleid"
         appGoogleClientSecret              <- o .:  "googlesecret"
-        appSlackWebhook             <- o .:  "slackwebook"
+        appSlackWebhook             <- o .:  "slackwebhook"
         appAllowedDomain             <- o .:  "allowedDomain"
         appAnalytics              <- o .:? "analytics"
 
