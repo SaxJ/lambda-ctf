@@ -27,6 +27,7 @@ import Yesod.Core.Types (Logger)
 import qualified Yesod.Core.Unsafe as Unsafe
 import Yesod.Default.Util (addStaticContentExternal)
 import Yesod.Auth.Message (AuthMessage(InvalidEmailAddress))
+import System.Environment (getEnv)
 
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -238,14 +239,14 @@ instance YesodAuth App where
     Creds App ->
     m (AuthenticationResult App)
   authenticate creds = liftHandler $ do
-    app <- getYesod
     let email = fromMaybe "no_email" $ extrasToEmail $ credsExtra creds
+    allowedEmail <- liftIO $ getEnv "ALLOWED_DOMAIN"
     runDB $ do
       x <- getBy $ UniqueUser (credsPlugin creds) (credsIdent creds)
       case x of
         Just (Entity uid _) -> return $ Authenticated uid
         Nothing ->
-          if checkEmail app email then
+          if checkEmail (pack allowedEmail) email then
             Authenticated
               <$> insert
                 User
@@ -262,8 +263,8 @@ instance YesodAuth App where
   authPlugins :: App -> [AuthPlugin App]
   authPlugins app = [oauth2Google (appGoogleClientId $ appSettings app) (appGoogleClientSecret $ appSettings app), authDummy]
 
-checkEmail :: App -> Text -> Bool
-checkEmail app email = email `isSuffixOf` appAllowedDomain (appSettings app)
+checkEmail :: Text -> Text -> Bool
+checkEmail allowed email = allowed `isSuffixOf` email
 
 -- | Access function to determine if a user is logged in.
 isAuthenticated :: Handler AuthResult
