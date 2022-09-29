@@ -9,6 +9,7 @@
 {-# HLINT ignore "Use newtype instead of data" #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# OPTIONS_GHC -Wno-unused-matches #-}
+{-# LANGUAGE StrictData #-}
 
 module Handler.Challenge where
 
