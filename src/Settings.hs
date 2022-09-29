@@ -65,6 +65,7 @@ data AppSettings = AppSettings
     , appGoogleClientId :: Text
     , appGoogleClientSecret :: Text
     , appSlackWebhook :: String
+    , appAllowedDomain :: Text
     }
 
 instance FromJSON AppSettings where

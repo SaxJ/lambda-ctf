@@ -1,4 +1,3 @@
-{-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -27,6 +26,7 @@ import Yesod.Auth.OAuth2.Slack
 import Yesod.Core.Types (Logger)
 import qualified Yesod.Core.Unsafe as Unsafe
 import Yesod.Default.Util (addStaticContentExternal)
+import Yesod.Auth.Message (AuthMessage(InvalidEmailAddress))
 
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -238,24 +238,32 @@ instance YesodAuth App where
     Creds App ->
     m (AuthenticationResult App)
   authenticate creds = liftHandler $ do
+    app <- getYesod
+    let email = fromMaybe "no_email" $ extrasToEmail $ credsExtra creds
     runDB $ do
       x <- getBy $ UniqueUser (credsPlugin creds) (credsIdent creds)
       case x of
         Just (Entity uid _) -> return $ Authenticated uid
         Nothing ->
-          Authenticated
-            <$> insert
-              User
-                { userIdent = credsIdent creds,
-                  userAdmin = False,
-                  userEmail = fromMaybe "" $ extrasToEmail $ credsExtra creds,
-                  userPlugin = credsPlugin creds,
-                  userName = takeWhile (/= '@') $ fromMaybe "" $ extrasToEmail $ credsExtra creds
-                }
+          if checkEmail app email then
+            Authenticated
+              <$> insert
+                User
+                  { userIdent = credsIdent creds,
+                    userAdmin = False,
+                    userEmail = email,
+                    userPlugin = credsPlugin creds,
+                    userName = takeWhile (/= '@') $ fromMaybe "" $ extrasToEmail $ credsExtra creds
+                  }
+          else
+            return $ UserError InvalidEmailAddress
 
   -- You can add other plugins like Google Email, email or OAuth here
   authPlugins :: App -> [AuthPlugin App]
   authPlugins app = [oauth2Google (appGoogleClientId $ appSettings app) (appGoogleClientSecret $ appSettings app), authDummy]
+
+checkEmail :: App -> Text -> Bool
+checkEmail app email = email `isSuffixOf` appAllowedDomain (appSettings app)
 
 -- | Access function to determine if a user is logged in.
 isAuthenticated :: Handler AuthResult
