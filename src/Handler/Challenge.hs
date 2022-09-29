@@ -64,7 +64,7 @@ makeSlackRequest :: MonadIO m => App -> Text -> Text -> m (Response ())
 makeSlackRequest app c u = do
   Network.HTTP.Simple.httpNoBody postReq
   where
-    initReq = parseRequest_ (appSlackWebhook $ appSettings app)
+    initReq = parseRequest_ (unpack $ appSlackWebhook $ appSettings app)
     body = SlackBody u c
     jsonReq = setRequestBodyJSON body initReq
     postReq = jsonReq {method = "POST"}

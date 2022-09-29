@@ -64,7 +64,7 @@ data AppSettings = AppSettings
     -- ^ Indicate if auth dummy login should be enabled.
     , appGoogleClientId :: Text
     , appGoogleClientSecret :: Text
-    , appSlackWebhook :: String
+    , appSlackWebhook :: Text
     , appAllowedDomain :: Text
     }
 
@@ -92,10 +92,10 @@ instance FromJSON AppSettings where
         appSkipCombining          <- o .:? "skip-combining"   .!= dev
 
         appCopyright              <- o .:  "copyright"
-        appGoogleClientId              <- o .:  "googleid"
-        appGoogleClientSecret              <- o .:  "googlesecret"
-        appSlackWebhook             <- o .:  "slackwebhook"
-        appAllowedDomain             <- o .:  "allowedDomain"
+        appGoogleClientId         <- o .:  "googleid"
+        appGoogleClientSecret     <- o .:  "googlesecret"
+        appSlackWebhook           <- o .:  "slackwebhook"
+        appAllowedDomain          <- o .:  "allowedDomain"
         appAnalytics              <- o .:? "analytics"
 
         appAuthDummyLogin         <- o .:? "auth-dummy-login"      .!= dev
