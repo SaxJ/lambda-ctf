@@ -4,7 +4,7 @@ buildImage = 'haskell:latest'
 cmd = 'stack setup'
 
 [phases.build]
-aptPkgs = ['libpq-dev']
+aptPkgs = ['...', 'libpq-dev']
 cmd = 'stack install'
 
 [start]
