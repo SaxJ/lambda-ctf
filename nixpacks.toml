@@ -1,2 +1,3 @@
 [phases.build]
 aptPkgs = ['...', 'libpq-dev']
+cmd = 'stack build --keep-going'
