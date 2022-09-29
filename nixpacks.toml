@@ -1,5 +1,3 @@
-buildImage = 'haskell:latest'
-
 [phases.setup]
 cmd = 'stack setup'
 
