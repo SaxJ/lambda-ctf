@@ -11,6 +11,7 @@
 {-# OPTIONS_GHC -Wno-unused-matches #-}
 {-# LANGUAGE StrictData #-}
 {-# LANGUAGE GADTs #-}
+{-# OPTIONS_GHC -Wno-deferred-out-of-scope-variables #-}
 
 module Handler.Challenge where
 
@@ -53,9 +54,11 @@ postChallengeR cid = do
   let goodSubmission = checkResult submission flags
   let msg = if goodSubmission then Just "Correct" :: Maybe String else Just "Incorrect"
   Control.Monad.when goodSubmission $ do
-    _ <- makeSlackRequest app (challengeName challenge) (userName user')
-    _ <- runDB $ insert $ Submission uid cid
-    return ()
+    ex <- runDB $ getBy (UniqueSubmission uid cid)
+    Control.Monad.when (isNothing ex) $ do
+      _ <- makeSlackRequest app (challengeName challenge) (userName user')
+      _ <- runDB $ insert $ Submission uid cid
+      return ()
 
   defaultLayout
     $(widgetFile "challenge")

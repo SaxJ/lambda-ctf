@@ -35,7 +35,7 @@ database:
   user:     "_env:YESOD_PGUSER:ctf"
   password: "_env:YESOD_PGPASS:ctf"
   host:     "_env:YESOD_PGHOST:localhost"
-  port:     "_env:YESOD_PGPORT:5432"
+  port:     "_env:YESOD_PGPORT:6432"
   # See config/test-settings.yml for an override during tests
   database: "_env:YESOD_PGDATABASE:ctf"
   poolsize: "_env:YESOD_PGPOOLSIZE:10"
