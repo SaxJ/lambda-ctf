@@ -30,3 +30,4 @@ Flag
 Submission
     userId UserId
     challengeId ChallengeId
+    UniqueSubmission userId challengeId

@@ -42,7 +42,7 @@ getChallengeR cid = do
 postChallengeR :: ChallengeId -> Handler Html
 postChallengeR cid = do
   app <- getYesod
-  (uid, user) <- requireAuthPair
+  (uid, user') <- requireAuthPair
   challenge <- runDB $ get404 cid
   flags <- runDB $ selectList [FlagChallengeId ==. cid] []
   ((submission, _), _) <- runFormPost flagSubmissionForm
@@ -51,7 +51,7 @@ postChallengeR cid = do
   let goodSubmission = checkResult submission flags
   let msg = if goodSubmission then Just "Correct" :: Maybe String else Just "Incorrect"
   Control.Monad.when goodSubmission $ do
-    _ <- makeSlackRequest app (challengeName challenge) (userName user)
+    _ <- makeSlackRequest app (challengeName challenge) (userName user')
     _ <- runDB $ insert $ Submission uid cid
     return ()
 
