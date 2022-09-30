@@ -1,6 +1,7 @@
 body {
     background-color: black;
-    color: green;
+    color: lightgreen;
+    font-family: Consolas, monaco, monospace;
 }
 
 a, a:visited, a:hover {
@@ -8,7 +9,7 @@ a, a:visited, a:hover {
     }
 
 table, th, td {
-  border: 1px solid green;
+  border: 1px solid lightgreen;
   border-collapse: collapse;
 }
 th, td {
@@ -17,5 +18,5 @@ th, td {
 }
 
 .loggedin {
-        margin-left: 20px;
-    }
+    margin-left: 20px;
+}
