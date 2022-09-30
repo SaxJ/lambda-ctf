@@ -5,7 +5,7 @@ body {
 }
 
 a, a:visited, a:hover {
-        color: green;
+        color: lightgreen;
     }
 
 table, th, td {
