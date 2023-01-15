@@ -239,14 +239,15 @@ instance YesodAuth App where
     Creds App ->
     m (AuthenticationResult App)
   authenticate creds = liftHandler $ do
+    app <- getYesod
     let email = fromMaybe "no_email" $ extrasToEmail $ credsExtra creds
-    allowedEmail <- liftIO $ getEnv "ALLOWED_DOMAIN"
+    let allowedEmail = appAllowedDomain $ appSettings app
     runDB $ do
       x <- getBy $ UniqueUser (credsPlugin creds) (credsIdent creds)
       case x of
         Just (Entity uid _) -> return $ Authenticated uid
         Nothing ->
-          if checkEmail (pack allowedEmail) email then
+          if checkEmail app allowedEmail email then
             Authenticated
               <$> insert
                 User
@@ -265,8 +266,8 @@ instance YesodAuth App where
     where
       dummy = [authDummy | appAuthDummyLogin $ appSettings app]
 
-checkEmail :: Text -> Text -> Bool
-checkEmail allowed email = allowed `isSuffixOf` email
+checkEmail :: App -> Text -> Text -> Bool
+checkEmail app allowed email = (allowed `isSuffixOf` email) || appAuthDummyLogin (appSettings app)
 
 -- | Access function to determine if a user is logged in.
 isAuthenticated :: Handler AuthResult
