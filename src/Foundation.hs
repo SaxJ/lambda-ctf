@@ -261,7 +261,9 @@ instance YesodAuth App where
 
   -- You can add other plugins like Google Email, email or OAuth here
   authPlugins :: App -> [AuthPlugin App]
-  authPlugins app = [oauth2Google (appGoogleClientId $ appSettings app) (appGoogleClientSecret $ appSettings app)]
+  authPlugins app = oauth2Google (appGoogleClientId $ appSettings app) (appGoogleClientSecret $ appSettings app) : dummy
+    where
+      dummy = [authDummy | appAuthDummyLogin $ appSettings app]
 
 checkEmail :: Text -> Text -> Bool
 checkEmail allowed email = allowed `isSuffixOf` email
