@@ -11,8 +11,6 @@
 module Foundation where
 
 import Control.Monad.Logger (LogSource)
--- Used only when in "auth-dummy-login" setting is enabled.
-
 import Data.Aeson
 import Data.ByteString.Lazy.Internal (packChars)
 import qualified Data.CaseInsensitive as CI

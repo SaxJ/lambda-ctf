@@ -4,6 +4,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE StrictData #-}
 
 module Handler.Competition where
 
@@ -40,8 +41,10 @@ postCompetitionAdminR cid = do
     createAction r =
       case r of
         FormSuccess c -> do
-          entity <- runDB $ insertEntity $ Challenge (challengeFormName c) (unMarkdown $ challengeFormInformation c) cid 1
-          return $ Just entity
+          let rawFlags = lines $ unTextarea $ challengeFormFlags c
+          challengeEntity <- runDB $ insertEntity $ Challenge (challengeFormName c) (unMarkdown $ challengeFormInformation c) cid (challengeFormScore c)
+          runDB $ insertMany_ [Flag (entityKey challengeEntity) val | val <- rawFlags]
+          return $ Just challengeEntity
         _ -> return Nothing
 
 postCompetitionStartR :: CompetitionId -> Handler Html
@@ -60,8 +63,10 @@ competitionChallenges :: CompetitionId -> [Filter Challenge]
 competitionChallenges cid = [ChallengeComptitionId ==. cid]
 
 data ChallengeForm = ChallengeForm
-  { challengeFormName :: Text,
-    challengeFormInformation :: Markdown
+  { challengeFormName :: !Text,
+    challengeFormInformation :: !Markdown,
+    challengeFormScore :: !Int,
+    challengeFormFlags :: !Textarea
   }
 
 challengeCreationForm :: Form ChallengeForm
@@ -70,3 +75,5 @@ challengeCreationForm =
     ChallengeForm
       <$> areq textField "Name" Nothing
       <*> areq markdownField "Description" Nothing
+      <*> areq intField "Score" (Just 1)
+      <*> areq textareaField "Flags" Nothing
