@@ -1,14 +1,14 @@
-version: '3'
+version: '3.8'
 
 services:
     db:
       image: postgres
+      restart: always
       ports:
         - 6432:5432
       environment:
-        - POSTGRES_USER=okr
-        - POSTGRES_PASSWORD=okr
-        - POSTGRES_DB=okr
+        - POSTGRES_USER=ctf
+        - POSTGRES_PASSWORD=ctf
       networks:
         - db
 
