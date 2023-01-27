@@ -54,15 +54,18 @@ postChallengeR cid = do
   let goodSubmission = checkResult submission flags
   let msg = if goodSubmission then Just "Correct" :: Maybe String else Just "Incorrect"
   Control.Monad.when goodSubmission $ do
-    ex <- runDB $ getBy (UniqueSubmission uid cid)
+    ex <- runDB $ getBy (UniqueSubmission uid cid (getResult submission))
     Control.Monad.when (isNothing ex) $ do
       _ <- makeSlackRequest app (challengeName challenge) (userName user')
-      _ <- runDB $ insert $ Submission uid cid
+      _ <- runDB $ insert $ Submission uid cid (getResult submission)
       return ()
 
   defaultLayout
     $(widgetFile "challenge")
   where
+    getResult fs = case fs of
+        FormSuccess f -> formFlag f
+        _ -> ""
     checkResult r fs = case r of
       FormSuccess f -> formFlag f `elem` map (flagValue . entityVal) fs
       _ -> False
