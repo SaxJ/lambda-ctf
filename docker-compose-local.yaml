@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
     db:
-      image: postgres
+      image: docker.io/postgres
       restart: always
       ports:
         - 6432:5432
@@ -13,7 +13,7 @@ services:
         - db
 
     adminer:
-      image: adminer
+      image: docker.io/adminer
       restart: always
       ports:
         - 8080:8080
